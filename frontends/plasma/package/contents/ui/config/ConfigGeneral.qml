@@ -22,6 +22,7 @@ KCM.SimpleKCM {
     property alias cfg_backgroundOpacity: opacitySpin.value
     property string cfg_colorClaude
     property string cfg_colorCodex
+    property string cfg_colorCursor
     property string cfg_colorOpenrouter
     property string cfg_colorTypesafe
     property string cfg_warningColor
@@ -40,6 +41,7 @@ KCM.SimpleKCM {
     property var cfg_backgroundOpacityDefault
     property var cfg_colorClaudeDefault
     property var cfg_colorCodexDefault
+    property var cfg_colorCursorDefault
     property var cfg_colorOpenrouterDefault
     property var cfg_colorTypesafeDefault
     property var cfg_warningColorDefault
@@ -103,6 +105,11 @@ KCM.SimpleKCM {
             Kirigami.FormData.label: "Codex:"
             color: cfg_colorCodex
             onColorChanged: if (String(color) !== cfg_colorCodex) cfg_colorCodex = String(color)
+        }
+        KQC.ColorButton {
+            Kirigami.FormData.label: "Cursor:"
+            color: cfg_colorCursor
+            onColorChanged: if (String(color) !== cfg_colorCursor) cfg_colorCursor = String(color)
         }
         KQC.ColorButton {
             Kirigami.FormData.label: "OpenRouter:"

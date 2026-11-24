@@ -26,6 +26,7 @@ PlasmoidItem {
         providerColors: ({
             claude: root.cfg.colorClaude,
             codex: root.cfg.colorCodex,
+            cursor: root.cfg.colorCursor,
             openrouter: root.cfg.colorOpenrouter,
             typesafe: root.cfg.colorTypesafe
         })

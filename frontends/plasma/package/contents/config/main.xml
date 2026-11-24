@@ -19,6 +19,7 @@
         <!-- Colours: one per provider, every ring in its group -->
         <entry name="colorClaude" type="String"><default>#D77757</default></entry>
         <entry name="colorCodex" type="String"><default>#FFFFFF</default></entry>
+        <entry name="colorCursor" type="String"><default>#3CCFB4</default></entry>
         <entry name="colorOpenrouter" type="String"><default>#7AB8FF</default></entry>
         <entry name="colorTypesafe" type="String"><default>#D45BB6</default></entry>
         <entry name="warningColor" type="String"><default>#E5C07B</default></entry>

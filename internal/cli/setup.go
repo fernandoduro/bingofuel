@@ -43,6 +43,7 @@ func setup() error {
 	// 1. Detect.
 	_, claudeErr := (providers.Claude{Cfg: cfg.Claude}).CredentialSource()
 	_, codexErr := (providers.Codex{Cfg: cfg.Codex}).CredentialSource()
+	_, cursorErr := (providers.Cursor{Cfg: cfg.Cursor}).CredentialSource()
 	_, orSrc, _ := secrets.Get("openrouter", cfg.OpenRouter.KeyEnv)
 	_, tsSrc, _ := secrets.Get("typesafe", cfg.TypeSafe.KeyEnv)
 	found := func(err error) string {
@@ -57,8 +58,8 @@ func setup() error {
 		}
 		return "key in " + describeSource(s)
 	}
-	intro := fmt.Sprintf("Detected on this machine:\n\n  Claude      login %s\n  Codex       login %s\n  OpenRouter  %s\n  JEV         %s\n\nKeys are stored in your OS keyring and never printed.",
-		found(claudeErr), found(codexErr), keyFound(orSrc), keyFound(tsSrc))
+	intro := fmt.Sprintf("Detected on this machine:\n\n  Claude      login %s\n  Codex       login %s\n  Cursor      login %s\n  OpenRouter  %s\n  JEV         %s\n\nKeys are stored in your OS keyring and never printed.",
+		found(claudeErr), found(codexErr), found(cursorErr), keyFound(orSrc), keyFound(tsSrc))
 
 	enabled := []string{}
 	if !cfg.Found {
@@ -68,6 +69,9 @@ func setup() error {
 		if codexErr == nil || !errorIs(codexErr, model.StatusNotConfigured) {
 			enabled = append(enabled, "codex")
 		}
+		if cursorErr == nil || !errorIs(cursorErr, model.StatusNotConfigured) {
+			enabled = append(enabled, "cursor")
+		}
 		if orSrc != secrets.SourceNone {
 			enabled = append(enabled, "openrouter")
 		}
@@ -75,7 +79,7 @@ func setup() error {
 			enabled = append(enabled, "typesafe")
 		}
 	} else {
-		for id, on := range map[string]bool{"claude": cfg.Claude.Enabled, "codex": cfg.Codex.Enabled, "openrouter": cfg.OpenRouter.Enabled, "typesafe": cfg.TypeSafe.Enabled} {
+		for id, on := range map[string]bool{"claude": cfg.Claude.Enabled, "codex": cfg.Codex.Enabled, "cursor": cfg.Cursor.Enabled, "openrouter": cfg.OpenRouter.Enabled, "typesafe": cfg.TypeSafe.Enabled} {
 			if on {
 				enabled = append(enabled, id)
 			}
@@ -89,6 +93,7 @@ func setup() error {
 				Options(
 					huh.NewOption("Claude (subscription limits)", "claude"),
 					huh.NewOption("Codex (subscription limits)", "codex"),
+					huh.NewOption("Cursor (monthly plan usage)", "cursor"),
 					huh.NewOption("OpenRouter (prepaid credits)", "openrouter"),
 					huh.NewOption("JEV by TypeSafe (prepaid credits, estimated)", "typesafe"),
 				).Value(&enabled),
@@ -100,7 +105,7 @@ func setup() error {
 	for _, id := range enabled {
 		on[id] = true
 	}
-	cfg.Claude.Enabled, cfg.Codex.Enabled, cfg.OpenRouter.Enabled, cfg.TypeSafe.Enabled = on["claude"], on["codex"], on["openrouter"], on["typesafe"]
+	cfg.Claude.Enabled, cfg.Codex.Enabled, cfg.Cursor.Enabled, cfg.OpenRouter.Enabled, cfg.TypeSafe.Enabled = on["claude"], on["codex"], on["cursor"], on["openrouter"], on["typesafe"]
 
 	// 2. Per-provider details.
 	if on["claude"] {
@@ -139,6 +144,22 @@ func setup() error {
 			cfg.Codex.Meters = meters
 		}
 	}
+	if on["cursor"] {
+		meters := cfg.Cursor.Meters
+		if len(meters) == 0 {
+			meters = []string{"auto", "api"}
+		}
+		if err := huh.NewMultiSelect[string]().Title("Cursor rings").
+			Description("Auto and API are separate pools, each with its own cap. Monthly blends them; pick it on team plans that report no pools.").
+			Options(
+				huh.NewOption("Auto + Composer", "auto"),
+				huh.NewOption("API models", "api"),
+				huh.NewOption("Monthly (both pools blended)", "total"),
+			).Value(&meters).Validate(atLeastOne).Run(); err != nil {
+			return err
+		}
+		cfg.Cursor.Meters = meters
+	}
 	if on["openrouter"] {
 		if err := setupKey("openrouter", "OpenRouter", cfg.OpenRouter.KeyEnv, orSrc, func(ctx context.Context, key string) (string, error) {
 			g, err := providers.OpenRouter{Cfg: cfg.OpenRouter, Key: key}.Fetch(ctx, time.Now())
@@ -175,7 +196,7 @@ func setup() error {
 		return err
 	}
 	if e, err := engine.New(cfg); err == nil {
-		for _, id := range []string{"claude", "codex", "openrouter"} {
+		for _, id := range []string{"claude", "codex", "cursor", "openrouter"} {
 			e.Invalidate(id) // a new selection or key should show at once
 		}
 	}

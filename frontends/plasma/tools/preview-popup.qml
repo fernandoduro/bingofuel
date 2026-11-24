@@ -28,7 +28,7 @@ QQC2.ApplicationWindow {
 
     Store {
         id: store
-        providerColors: ({ claude: "#D77757", codex: "#FFFFFF", openrouter: "#7AB8FF", typesafe: "#D45BB6" })
+        providerColors: ({ claude: "#D77757", codex: "#FFFFFF", cursor: "#3CCFB4", openrouter: "#7AB8FF", typesafe: "#D45BB6" })
         textColor: "#eeeeee"
     }
 
