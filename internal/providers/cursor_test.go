@@ -189,3 +189,11 @@ func TestCursorSafeStorageToken(t *testing.T) {
 		t.Errorf("encrypted app token: cookie=%q err=%v", cookie, err)
 	}
 }
+
+func TestCursorDefaultRingsArePools(t *testing.T) {
+	_, meters, _ := parseCursor(fixture(t, "cursor-usage-summary.json"))
+	applySelection(meters, config.Defaults().Cursor.Meters)
+	if s := byID(meters); !s["auto"].Show || !s["api"].Show || s["total"].Show {
+		t.Errorf("default rings = %+v, want auto and api only (total blends them)", meters)
+	}
+}

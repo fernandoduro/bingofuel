@@ -56,7 +56,8 @@ type Cursor struct {
 	Enabled bool `toml:"enabled"`
 	// DB is Cursor's state.vscdb. Empty: <user config dir>/Cursor/User/globalStorage/state.vscdb.
 	DB string `toml:"db"`
-	// Meters shown as rings: total, auto, api. Empty: every reported meter.
+	// Meters shown as rings: auto, api, total. Empty: every reported meter.
+	// total blends the two pools, so it is off by default.
 	Meters []string `toml:"meters"`
 }
 
@@ -79,7 +80,7 @@ func Defaults() Config {
 		General:    General{MaxAgeSeconds: 300, Order: []string{"claude", "codex", "cursor", "openrouter", "typesafe"}},
 		Claude:     Claude{Enabled: true, Meters: []string{"session", "weekly"}},
 		Codex:      Codex{Enabled: true},
-		Cursor:     Cursor{Enabled: true},
+		Cursor:     Cursor{Enabled: true, Meters: []string{"auto", "api"}},
 		OpenRouter: OpenRouter{Enabled: true, KeyEnv: "OPENROUTER_API_KEY"},
 		TypeSafe:   TypeSafe{Enabled: true, KeyEnv: "TYPESAFE_API_KEY", PricePerMTok: 0.042},
 	}

@@ -147,14 +147,14 @@ func setup() error {
 	if on["cursor"] {
 		meters := cfg.Cursor.Meters
 		if len(meters) == 0 {
-			meters = []string{"total", "auto", "api"}
+			meters = []string{"auto", "api"}
 		}
 		if err := huh.NewMultiSelect[string]().Title("Cursor rings").
-			Description("Auto and API split the monthly usage by model pool, on plans that report them.").
+			Description("Auto and API are separate pools, each with its own cap. Monthly blends them; pick it on team plans that report no pools.").
 			Options(
-				huh.NewOption("Monthly (total)", "total"),
 				huh.NewOption("Auto + Composer", "auto"),
 				huh.NewOption("API models", "api"),
+				huh.NewOption("Monthly (both pools blended)", "total"),
 			).Value(&meters).Validate(atLeastOne).Run(); err != nil {
 			return err
 		}
