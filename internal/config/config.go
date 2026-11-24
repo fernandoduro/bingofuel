@@ -20,6 +20,7 @@ type Config struct {
 	General    General    `toml:"general"`
 	Claude     Claude     `toml:"claude"`
 	Codex      Codex      `toml:"codex"`
+	Cursor     Cursor     `toml:"cursor"`
 	OpenRouter OpenRouter `toml:"openrouter"`
 	TypeSafe   TypeSafe   `toml:"typesafe"`
 
@@ -51,6 +52,14 @@ type Codex struct {
 	Meters []string `toml:"meters"` // empty: every reported window
 }
 
+type Cursor struct {
+	Enabled bool `toml:"enabled"`
+	// DB is Cursor's state.vscdb. Empty: <user config dir>/Cursor/User/globalStorage/state.vscdb.
+	DB string `toml:"db"`
+	// Meters shown as rings: total, auto, api. Empty: every reported meter.
+	Meters []string `toml:"meters"`
+}
+
 type OpenRouter struct {
 	Enabled bool `toml:"enabled"`
 	// KeyEnv is an environment variable consulted after the keyring and file.
@@ -67,9 +76,10 @@ type TypeSafe struct {
 
 func Defaults() Config {
 	return Config{
-		General:    General{MaxAgeSeconds: 300, Order: []string{"claude", "codex", "openrouter", "typesafe"}},
+		General:    General{MaxAgeSeconds: 300, Order: []string{"claude", "codex", "cursor", "openrouter", "typesafe"}},
 		Claude:     Claude{Enabled: true, Meters: []string{"session", "weekly"}},
 		Codex:      Codex{Enabled: true},
+		Cursor:     Cursor{Enabled: true},
 		OpenRouter: OpenRouter{Enabled: true, KeyEnv: "OPENROUTER_API_KEY"},
 		TypeSafe:   TypeSafe{Enabled: true, KeyEnv: "TYPESAFE_API_KEY", PricePerMTok: 0.042},
 	}

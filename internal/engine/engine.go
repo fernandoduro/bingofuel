@@ -57,6 +57,9 @@ func Enabled(cfg config.Config) []providers.Provider {
 	if cfg.Codex.Enabled {
 		all["codex"] = providers.Codex{Cfg: cfg.Codex}
 	}
+	if cfg.Cursor.Enabled {
+		all["cursor"] = providers.Cursor{Cfg: cfg.Cursor}
+	}
 	if cfg.OpenRouter.Enabled {
 		all["openrouter"] = providers.OpenRouter{Cfg: cfg.OpenRouter}
 	}
@@ -70,7 +73,7 @@ func Enabled(cfg config.Config) []providers.Provider {
 			delete(all, id)
 		}
 	}
-	for _, id := range []string{"claude", "codex", "openrouter", "typesafe"} {
+	for _, id := range []string{"claude", "codex", "cursor", "openrouter", "typesafe"} {
 		if p, ok := all[id]; ok {
 			out = append(out, p)
 		}

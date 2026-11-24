@@ -70,6 +70,12 @@ func cmdDoctor(_ []string) int {
 			} else {
 				ok("login", src)
 			}
+		case "cursor":
+			if src, err := (providers.Cursor{Cfg: cfg.Cursor}).CredentialSource(); err != nil {
+				bad("login", err.Error())
+			} else {
+				ok("login", src)
+			}
 		case "openrouter":
 			keyLine("API key", "openrouter", cfg.OpenRouter.KeyEnv, ok, bad)
 		case "typesafe":
